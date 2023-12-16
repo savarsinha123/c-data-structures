@@ -1,1 +1,1 @@
-# cpp-data-structures
+# c-data-structures
