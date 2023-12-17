@@ -85,5 +85,5 @@ int main() {
     test_one_thru_ten();
     test_remove();
     test_remove_one();
-    printf("ALL TESTS PASSED...\n");
+    printf("ALL LIST TESTS PASSED...\n\n");
 }

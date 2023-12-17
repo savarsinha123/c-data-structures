@@ -24,7 +24,7 @@ void linked_list_free(linked_list_t *list);
 /**
  * Returns size of list
  * @param list
- * @returns retrieved element
+ * @returns size of list
  */
 size_t linked_list_size(linked_list_t *list);
 

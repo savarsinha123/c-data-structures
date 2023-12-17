@@ -3,7 +3,7 @@
 #include <assert.h>
 #include "linked_list.h"
 
-typedef void (*free_t)(void *);
+// typedef void (*free_t)(void *);
 
 typedef struct node {
     void *data;
@@ -69,18 +69,38 @@ void linked_list_add(linked_list_t *list, void *element) {
 
 void *linked_list_get(linked_list_t *list, size_t index) {
     assert(index < list->size); // check index within list
-    node_t *curr = list->head;
-    for (size_t i = 0; i < index; i++) {
-        curr = curr->next;
+    node_t *curr;
+
+    // choose which end to search from
+    if (index < list->size / 2) {
+        curr = list->head;
+        for (size_t i = 0; i < index; i++) {
+            curr = curr->next;
+        }
+    }
+    else {
+        curr = list->tail;
+        for (size_t i = 0; i < list->size - index - 1; i++) {
+            curr = curr->prev;
+        }
     }
     return curr->data;
 }
 
 void *linked_list_remove(linked_list_t *list, size_t index) {
     assert(index < list->size); // check index within list
-    node_t *curr = list->head;
-    for (size_t i = 0; i < index; i++) {
-        curr = curr->next;
+    node_t *curr;
+    if (index < list->size / 2) {
+        curr = list->head;
+        for (size_t i = 0; i < index; i++) {
+            curr = curr->next;
+        }
+    }
+    else {
+        curr = list->tail;
+        for (size_t i = 0; i < list->size - index - 1; i++) {
+            curr = curr->prev;
+        }
     }
 
     // checks if not head
