@@ -28,6 +28,7 @@ typedef struct hash_table {
     size_t capacity_index;
     size_t key_size; // num bytes of key type
     equals_t equals;
+    hash_t hasher;
     free_t key_freer;
     free_t value_freer;
 } hash_table_t;
@@ -52,7 +53,7 @@ key_value_t *key_value_init(void *key, void *value) {
     return key_value;
 }
 
-hash_table_t *hash_table_equals_init(size_t key_size, equals_t equals_func, 
+hash_table_t *hash_table_equals_init(size_t key_size, equals_t equals_func, hash_t hash_func,
                                     free_t key_freer, free_t value_freer) {
     hash_table_t *ht = malloc(sizeof(hash_table_t));
     ht->size = 0;
@@ -60,13 +61,14 @@ hash_table_t *hash_table_equals_init(size_t key_size, equals_t equals_func,
     ht->equals = equals_func;
     ht->key_size = key_size;
     ht->table = calloc(SIZES[ht->capacity_index], sizeof(key_value_t *));
+    ht->hasher = hash_func;
     ht->key_freer = key_freer;
     ht->value_freer = value_freer;
     return ht;
 }
 
 hash_table_t *hash_table_init(size_t key_size) {
-    return hash_table_equals_init(key_size, (equals_t) equals, free, free);
+    return hash_table_equals_init(key_size, (equals_t) equals, hash, free, free);
 }
 
 void hash_table_free(hash_table_t *ht) {
@@ -95,7 +97,7 @@ void resize(hash_table_t *ht) {
     // rehashing
     for (size_t i = 0; i < ht->size; i++) {
         key_value_t *key_value = copy[i];
-        size_t hash_key = hash(key_value->key, ht->key_size) % SIZES[ht->capacity_index];
+        size_t hash_key = ht->hasher(key_value->key, ht->key_size) % SIZES[ht->capacity_index];
         while (ht->table[hash_key] != NULL) {
             hash_key = (hash_key + STEP_SIZE) % SIZES[ht->capacity_index];
         }
@@ -106,7 +108,7 @@ void resize(hash_table_t *ht) {
 
 int64_t hash_table_get_index(hash_table_t *ht, void *key) {
     size_t loop_counter = 0;
-    size_t hash_key = hash(key, ht->key_size) % SIZES[ht->capacity_index];
+    size_t hash_key = ht->hasher(key, ht->key_size) % SIZES[ht->capacity_index];
     while (ht->table[hash_key] == NULL || !ht->equals(key, ht->table[hash_key]->key)) {
         if (loop_counter >= SIZES[ht->capacity_index]) {
             break;
@@ -133,26 +135,26 @@ void *hash_table_put(hash_table_t *ht, void *key, void *value) {
     void *key_copy = malloc(ht->key_size);
     memcpy(key_copy, key, ht->key_size);
     key_value_t *key_value = key_value_init(key_copy, value);
-    int index = hash_table_get_index(ht, key);
-    if (index >= 0) {
-        void *old_value = ht->table[index]->value;
-        ht->table[index]->value = value;
-        free(key_value->key);
-        free(key_value);
-        return old_value;
-    }
-    // perform linear probing
-    size_t hash_key = hash(key, ht->key_size) % SIZES[ht->capacity_index];
-    while (ht->table[hash_key] != NULL) {
-        hash_key = (hash_key + STEP_SIZE) % SIZES[ht->capacity_index];
-    }
-    // if (ht->table[hash_key] != NULL) {
-    //     void *old_value = ht->table[hash_key]->value;
-    //     ht->table[hash_key]->value = value;
+    // int index = hash_table_get_index(ht, key);
+    // if (index >= 0) {
+    //     void *old_value = ht->table[index]->value;
+    //     ht->table[index]->value = value;
     //     free(key_value->key);
     //     free(key_value);
     //     return old_value;
     // }
+    // perform linear probing
+    size_t hash_key = ht->hasher(key, ht->key_size) % SIZES[ht->capacity_index];
+    while (ht->table[hash_key] != NULL && !ht->equals(key, ht->table[hash_key]->key)) {
+        hash_key = (hash_key + STEP_SIZE) % SIZES[ht->capacity_index];
+    }
+    if (ht->table[hash_key] != NULL) {
+        void *old_value = ht->table[hash_key]->value;
+        ht->table[hash_key]->value = value;
+        free(key_value->key);
+        free(key_value);
+        return old_value;
+    }
     ht->table[hash_key] = key_value;
     ht->size++;
     return NULL;

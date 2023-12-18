@@ -21,7 +21,8 @@ hash_table_t *hash_table_init(size_t key_size);
  * Initializes hash table with custom equals function and freers
  * @return newly initialized hash table
  */
-hash_table_t *hash_table_equals_init(size_t key_size, equals_t equals_func, free_t key_freer, free_t value_freer);
+hash_table_t *hash_table_equals_init(size_t key_size, equals_t equals_func, hash_t hash_func,
+                                    free_t key_freer, free_t value_freer);
 
 /** 
  * Frees hash table

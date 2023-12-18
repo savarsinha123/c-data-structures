@@ -6,6 +6,7 @@
 #include "tree_set.h"
 
 const double PI = 3.14159265359;
+const size_t HASH_BYTES = 8;
 
 typedef struct example {
     int a;
@@ -34,6 +35,15 @@ example_t *example_init(int64_t value) {
 
 bool example_equals(example_t *example1, example_t *example2) {
     return example1->a == example2->a;
+}
+
+size_t example_hash(example_t *example, size_t _) {
+    const unsigned char *key_str = (const unsigned char *) example;
+    size_t hash = 5381; // Initial hash value
+    for (size_t i = 0; i < HASH_BYTES; ++i) {
+        hash = (hash * 33) ^ key_str[i];
+    }
+    return hash;
 }
 
 void example_free(example_t *example) {
@@ -124,7 +134,8 @@ void test_remove() {
 }
 
 void test_struct_key() {
-    hash_table_t *ht = hash_table_equals_init(sizeof(example_t), (equals_t) example_equals, (free_t) example_free, free);
+    hash_table_t *ht = hash_table_equals_init(sizeof(example_t), (equals_t) example_equals, 
+                        (hash_t) example_hash, (free_t) example_free, free);
     for (int i = 10; i < 20; i ++) {
         example_t *example = example_init(i);
         char *c = malloc(sizeof(*c));
