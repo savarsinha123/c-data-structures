@@ -3,4 +3,5 @@ This repository features a plethora of different data structures that are common
 1. Linked List
 2. Stack
 3. Tree Set
+
 There are tests included for each of these to demonstrate that they work without memory leaks, segfaults, etc. There are also come complexity test; however, these are still a WIP.
