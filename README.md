@@ -4,4 +4,8 @@ This repository features a plethora of different data structures that are common
 2. Stack
 3. Tree Set
 
+<<<<<<< HEAD
 There are tests included for each of these to demonstrate that they work without memory leaks, segfaults, etc. There are also come complexity test; however, these are still a WIP.
+=======
+There are tests included for each of these to demonstrate that they work without memory leaks, segfaults, etc. There are also come complexity test; however, these are still a WIP.
+>>>>>>> 5ab740fc8a5403f01ed0afd626d61a9bdce04599
