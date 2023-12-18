@@ -5,21 +5,21 @@
 
 // typedef void (*free_t)(void *);
 
-typedef struct node {
+typedef struct linked_node {
     void *data;
-    node_t *prev;
-    node_t *next;
-} node_t;
+    linked_node_t *prev;
+    linked_node_t *next;
+} linked_node_t;
 
 typedef struct linked_list {
-    node_t *head;
-    node_t *tail;
+    linked_node_t *head;
+    linked_node_t *tail;
     size_t size;
     free_t freer;
 } linked_list_t;
 
-node_t *node_init(void *data, node_t *prev, node_t *next) {
-    node_t *node = malloc(sizeof(node_t));
+linked_node_t *node_init(void *data, linked_node_t *prev, linked_node_t *next) {
+    linked_node_t *node = malloc(sizeof(linked_node_t));
     node->data = data;
     node->prev = prev;
     node->next = next;
@@ -40,7 +40,7 @@ linked_list_t *linked_list_init() {
     return linked_list_free_init(free);
 }
 
-void node_free(node_t *node, free_t freer) {
+void node_free(linked_node_t *node, free_t freer) {
     // recursively frees nodes
     if (node->next != NULL) {
         node_free(node->next, freer);
@@ -66,7 +66,7 @@ void linked_list_add(linked_list_t *list, void *element) {
         list->tail = list->head;
     }
     else {
-        node_t *old_tail = list->tail;
+        linked_node_t *old_tail = list->tail;
         list->tail = node_init(element, old_tail, NULL);
         old_tail->next = list->tail;
     }
@@ -75,7 +75,7 @@ void linked_list_add(linked_list_t *list, void *element) {
 
 void *linked_list_get(linked_list_t *list, size_t index) {
     assert(index < list->size); // check index within list
-    node_t *curr;
+    linked_node_t *curr;
 
     // choose which end to search from
     if (index < list->size / 2) {
@@ -95,7 +95,7 @@ void *linked_list_get(linked_list_t *list, size_t index) {
 
 void *linked_list_remove(linked_list_t *list, size_t index) {
     assert(index < list->size); // check index within list
-    node_t *curr;
+    linked_node_t *curr;
     if (index < list->size / 2) {
         curr = list->head;
         for (size_t i = 0; i < index; i++) {

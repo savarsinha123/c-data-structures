@@ -6,8 +6,8 @@
 #include "linked_list.h"
 #include "function_types.h"
 
-/** Node for linked list */
-typedef struct node node_t;
+/** BST node */
+typedef struct tree_node tree_node_t;
 
 /** Tree set struct implemented based on binary search tree */
 typedef struct tree_set tree_set_t;

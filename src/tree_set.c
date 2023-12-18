@@ -5,20 +5,20 @@
 #include "tree_set.h"
 #include "string.h"
 
-typedef struct node {
+typedef struct tree_node {
     void *value;
-    node_t *left;
-    node_t *right;
-} node_t;
+    tree_node_t *left;
+    tree_node_t *right;
+} tree_node_t;
 
 typedef struct tree_set {
-    node_t *root;
+    tree_node_t *root;
     size_t size;
     compar_t compar;
     free_t freer;
 } tree_set_t;
 
-size_t num_children(node_t *node) {
+size_t num_children(tree_node_t *node) {
     return (node->left != NULL) + (node->right != NULL);
 }
 
@@ -27,8 +27,8 @@ int compare_num(int *a, int *b) {
     return *a - *b;
 }
 
-node_t *tree_node_init(void *value) {
-    node_t *node = malloc(sizeof(node_t));
+tree_node_t *tree_node_init(void *value) {
+    tree_node_t *node = malloc(sizeof(tree_node_t));
     node->left = NULL;
     node->right = NULL;
     node->value = value;
@@ -53,7 +53,7 @@ tree_set_t *tree_set_init() {
     return tree_set_comp_init((compar_t) compare_num, free);
 }
 
-void tree_node_free(node_t *node, free_t freer) {
+void tree_node_free(tree_node_t *node, free_t freer) {
     if (node->left != NULL) {
         tree_node_free(node->left, freer);
     }
@@ -79,7 +79,7 @@ bool tree_set_is_empty(tree_set_t *set) {
     return set->size == 0;
 }
 
-bool node_contains(node_t *curr, void *value, compar_t compar) {
+bool node_contains(tree_node_t *curr, void *value, compar_t compar) {
     int comparison = compar(value, curr->value);
     if (comparison < 0) {
         // base case
@@ -109,12 +109,12 @@ bool tree_set_contains(tree_set_t *set, void *element) {
     return node_contains(set->root, element, set->compar);
 }
 
-void node_add(tree_set_t *set, node_t *curr, void *value, compar_t compar) {
+void node_add(tree_set_t *set, tree_node_t *curr, void *value, compar_t compar) {
     int comparison = compar(value, curr->value);
     if (comparison < 0) {
         // base case
         if (curr->left == NULL) {
-            node_t *new_node = tree_node_init(value);
+            tree_node_t *new_node = tree_node_init(value);
             curr->left = new_node;
         }
         else {
@@ -124,7 +124,7 @@ void node_add(tree_set_t *set, node_t *curr, void *value, compar_t compar) {
     else if (comparison > 0) {
         // base case
         if (curr->right == NULL) {
-            node_t *new_node = tree_node_init(value);
+            tree_node_t *new_node = tree_node_init(value);
             curr->right = new_node;
         }
         else {
@@ -146,7 +146,7 @@ void tree_set_add(tree_set_t *set, void *element) {
     set->size++;
 }
 
-node_t *find_max(node_t *to_remove, node_t *curr, node_t *prev) {
+tree_node_t *find_max(tree_node_t *to_remove, tree_node_t *curr, tree_node_t *prev) {
     if (curr->right == NULL) {
         if (to_remove == prev) {
             prev->left = curr->left;
@@ -177,7 +177,7 @@ void replace_root(tree_set_t *set) {
         break;
     default:
         // case when two children are present
-        node_t *old_root = set->root;
+        tree_node_t *old_root = set->root;
         set->root = find_max(set->root, set->root->left, set->root);
         set->root->left = old_root->left;
         set->root->right = old_root->right;
@@ -185,7 +185,7 @@ void replace_root(tree_set_t *set) {
     }
 }
 
-void replace_node_left(node_t *to_remove, node_t *parent) {
+void replace_node_left(tree_node_t *to_remove, tree_node_t *parent) {
     size_t children = num_children(to_remove);
     switch(children) {
     case 0:
@@ -210,7 +210,7 @@ void replace_node_left(node_t *to_remove, node_t *parent) {
     }
 }
 
-void replace_node_right(node_t *to_remove, node_t *parent) {
+void replace_node_right(tree_node_t *to_remove, tree_node_t *parent) {
     size_t children = num_children(to_remove);
     switch(children) {
     case 0:
@@ -232,7 +232,7 @@ void replace_node_right(node_t *to_remove, node_t *parent) {
     }
 }
 
-void *remove_node(tree_set_t *set, node_t *curr, node_t *prev, void *value, compar_t compar) {
+void *remove_node(tree_set_t *set, tree_node_t *curr, tree_node_t *prev, void *value, compar_t compar) {
     int comparison = compar(value, curr->value);
     if (comparison < 0) {
         assert(curr->left != NULL);

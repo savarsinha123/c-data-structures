@@ -135,14 +135,7 @@ void *hash_table_put(hash_table_t *ht, void *key, void *value) {
     void *key_copy = malloc(ht->key_size);
     memcpy(key_copy, key, ht->key_size);
     key_value_t *key_value = key_value_init(key_copy, value);
-    // int index = hash_table_get_index(ht, key);
-    // if (index >= 0) {
-    //     void *old_value = ht->table[index]->value;
-    //     ht->table[index]->value = value;
-    //     free(key_value->key);
-    //     free(key_value);
-    //     return old_value;
-    // }
+
     // perform linear probing
     size_t hash_key = ht->hasher(key, ht->key_size) % SIZES[ht->capacity_index];
     while (ht->table[hash_key] != NULL && !ht->equals(key, ht->table[hash_key]->key)) {

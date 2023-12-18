@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include "function_types.h"
 
-/** Node for linked list */
-typedef struct node node_t;
+/** Linked list node */
+typedef struct linked_node linked_node_t; 
 
 /** Doubly linked list struct */
 typedef struct linked_list linked_list_t;
