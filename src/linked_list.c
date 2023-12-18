@@ -15,6 +15,7 @@ typedef struct linked_list {
     node_t *head;
     node_t *tail;
     size_t size;
+    free_t freer;
 } linked_list_t;
 
 node_t *node_init(void *data, node_t *prev, node_t *next) {
@@ -25,27 +26,32 @@ node_t *node_init(void *data, node_t *prev, node_t *next) {
     return node;
 }
 
-linked_list_t *linked_list_init() {
+linked_list_t *linked_list_free_init(free_t freer) {
     linked_list_t *list = malloc(sizeof(linked_list_t));
     assert(list != NULL); // checks memory is allocated properly
     list->head = NULL;
     list->tail = NULL;
     list->size = 0;
+    list->freer = freer;
     return list;
 }
 
-void node_free(node_t *node) {
+linked_list_t *linked_list_init() {
+    return linked_list_free_init(free);
+}
+
+void node_free(node_t *node, free_t freer) {
     // recursively frees nodes
     if (node->next != NULL) {
-        node_free(node->next);
+        node_free(node->next, freer);
     }
-    free(node->data);
+    freer(node->data);
     free(node);
 }
 
 void linked_list_free(linked_list_t *list) {
     if (list->head != NULL) {
-        node_free(list->head);
+        node_free(list->head, list->freer);
     }
     free(list);
 }

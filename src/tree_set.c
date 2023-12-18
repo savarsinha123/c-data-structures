@@ -15,6 +15,7 @@ typedef struct tree_set {
     node_t *root;
     size_t size;
     compar_t compar;
+    free_t freer;
 } tree_set_t;
 
 size_t num_children(node_t *node) {
@@ -34,37 +35,38 @@ node_t *tree_node_init(void *value) {
     return node;
 }
 
-tree_set_t *tree_set_comp_init(compar_t compar) {
+tree_set_t *tree_set_comp_init(compar_t compar, free_t freer) {
     tree_set_t *set = malloc(sizeof(tree_set_t));
     assert(set != NULL); // check that memory was allocated
     set->root = NULL;
     set->size = 0;
     set->compar = compar;
+    set->freer = freer;
     return set;
 }
 
 tree_set_t *tree_set_str_init() {
-    return tree_set_comp_init((compar_t) strcmp);
+    return tree_set_comp_init((compar_t) strcmp, free);
 }
 
 tree_set_t *tree_set_init() {
-    return tree_set_comp_init((compar_t) compare_num);
+    return tree_set_comp_init((compar_t) compare_num, free);
 }
 
-void tree_node_free(node_t *node) {
+void tree_node_free(node_t *node, free_t freer) {
     if (node->left != NULL) {
-        tree_node_free(node->left);
+        tree_node_free(node->left, freer);
     }
     if (node->right != NULL) {
-        tree_node_free(node->right);
+        tree_node_free(node->right, freer);
     }
-    free(node->value);
+    freer(node->value);
     free(node);
 }
 
 void tree_set_free(tree_set_t *set) {
     if (set->root != NULL) {
-        tree_node_free(set->root);
+        tree_node_free(set->root, set->freer);
     }
     free(set);
 }
@@ -229,50 +231,6 @@ void replace_node_right(node_t *to_remove, node_t *parent) {
         break;
     }
 }
-
-// void replace_node(node_t *to_remove, node_t *parent, char side) {
-//     size_t children = num_children(to_remove);
-//     if (side == 'l') {
-//         switch(children) {
-//         case 0:
-//             // case for zero children (leaf)
-//             parent->left = NULL; 
-//             break;
-//         case 1:
-//             // case for one child
-//             if (to_remove->left == NULL) {
-//                 parent->left = to_remove->right;
-//             }
-//             else {
-//                 parent->left = to_remove->left;
-//             }
-//             break;
-//         default:
-//             // case when two children are present
-//             parent->left = find_max(to_remove->left, to_remove);
-//             break;
-//         }
-//     }
-//     else {
-//         switch(children) {
-//         case 0:
-//             parent->right = NULL; 
-//             break;
-//         case 1:
-//             if (to_remove->right == NULL) {
-//                 parent->right = to_remove->right;
-//             }
-//             else {
-//                 parent->right = to_remove->left;
-//             }
-//             break;
-//         default:
-//             parent->right = find_max(to_remove, NULL);
-//             break;
-//         }
-//     }
-    
-// }
 
 void *remove_node(tree_set_t *set, node_t *curr, node_t *prev, void *value, compar_t compar) {
     int comparison = compar(value, curr->value);

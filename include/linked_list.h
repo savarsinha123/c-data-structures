@@ -2,6 +2,7 @@
 #define LINKED_LIST
 
 #include <stdio.h>
+#include "function_types.h"
 
 /** Node for linked list */
 typedef struct node node_t;
@@ -14,6 +15,12 @@ typedef struct linked_list linked_list_t;
  * @return newly initialized linked list
  */
 linked_list_t *linked_list_init();
+
+/** 
+ * Initializes linked list with custom freeing function (e.g. to free a struct)
+ * @return newly initialized linked list
+ */
+linked_list_t *linked_list_free_init(free_t freer);
 
 /** 
  * Frees linked list

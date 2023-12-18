@@ -4,15 +4,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "linked_list.h"
+#include "function_types.h"
 
 /** Node for linked list */
 typedef struct node node_t;
 
 /** Tree set struct implemented based on binary search tree */
 typedef struct tree_set tree_set_t;
-
-/** Comparison function type */
-typedef int (*compar_t)(void *, void *);
 
 /** 
  * Initializes tree set of nums/chars
@@ -29,13 +27,14 @@ tree_set_t *tree_set_str_init();
 /** 
  * Initializes tree set with given comparator
  * @param compar the function used to compare elements
+ * @param freer the function used to free individual elements
  * Compare function should return
  *  >0 if arg1 < arg2,
  *  0 if arg1 == arg2,
  *  <0 if arg1 > arg2
  * @return newly initialized tree set
  */
-tree_set_t *tree_set_comp_init(compar_t compar);
+tree_set_t *tree_set_comp_init(compar_t compar, free_t freer);
 
 /** 
  * Frees tree set
