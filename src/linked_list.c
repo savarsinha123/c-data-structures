@@ -45,7 +45,9 @@ void node_free(linked_node_t *node, free_t freer) {
     if (node->next != NULL) {
         node_free(node->next, freer);
     }
-    freer(node->data);
+    if (freer != NULL) {
+        freer(node->data);
+    }
     free(node);
 }
 

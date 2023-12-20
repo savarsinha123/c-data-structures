@@ -22,8 +22,7 @@ size_t num_children(tree_node_t *node) {
     return (node->left != NULL) + (node->right != NULL);
 }
 
-int compare_num(int *a, int *b) {
-    // assert(*a != NULL);
+int compare_int(int *a, int *b) {
     return *a - *b;
 }
 
@@ -50,7 +49,7 @@ tree_set_t *tree_set_str_init() {
 }
 
 tree_set_t *tree_set_init() {
-    return tree_set_comp_init((compar_t) compare_num, free);
+    return tree_set_comp_init((compar_t) compare_int, free);
 }
 
 void tree_node_free(tree_node_t *node, free_t freer) {
@@ -268,4 +267,20 @@ void *tree_set_remove(tree_set_t *set, void *element) {
     void *value = remove_node(set, set->root, NULL, element, set->compar);
     set->size--;
     return value;
+}
+
+void node_add_to_list(tree_node_t *node, linked_list_t *list) {
+    if (node->left != NULL) {
+        node_add_to_list(node->left, list);
+    }
+    linked_list_add(list, node->value); // this way list is sorted
+    if (node->right != NULL) {
+        node_add_to_list(node->right, list);
+    }
+}
+
+linked_list_t *tree_set_to_list(tree_set_t *set) {
+    linked_list_t *list = linked_list_free_init(NULL); // freeing list does not free elements
+    node_add_to_list(set->root, list);
+    return list;
 }

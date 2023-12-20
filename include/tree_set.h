@@ -77,4 +77,14 @@ void *tree_set_remove(tree_set_t *set, void *element);
  */
 bool tree_set_contains(tree_set_t *set, void *element);
 
+/** 
+ * Returns the elements of a tree set as an iterable
+ * list. List contains the same pointers as set, but
+ * freeing list does not free set. Freeing set; however,
+ * does free the list
+ * @param set
+ * @return list of set elements
+ */
+linked_list_t *tree_set_to_list(tree_set_t *set);
+
 #endif
