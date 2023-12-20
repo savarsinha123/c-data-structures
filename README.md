@@ -6,4 +6,6 @@ This repository features a plethora of different data structures that are common
 4. Tree Set
 5. Hash Tables
 
-There are tests included for each of these to demonstrate that they work without memory leaks, segfaults, etc. There are also come complexity test; however, these are still a WIP.
+There are tests included for each of these to demonstrate that they work without memory leaks, segfaults, etc. There is also a python script that showcases some examples of the time required to perform given operations on each structure varies with the sizes of said structures.
+
+To run the accuracy and complexity tests, simply run `make all`.
